@@ -1,0 +1,6 @@
+docker-stop() {
+	for id in $(docker ps -a | awk '{print $1}' | tail -n+2); do
+		docker stop $id; docker rm $id;
+	done
+}
+

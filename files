@@ -1,0 +1,15 @@
+#!/bin/zsh
+
+# Function to check if a file exists
+# Arguments:
+#   file - the path of the file to check
+# Returns:
+#   None
+checkFileExistence() {
+    file=$1
+    if [ -f "$file" ]; then
+        echo "File found: $file"
+    else
+        echo "File not found: $file"
+    fi
+}
