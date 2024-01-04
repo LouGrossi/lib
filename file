@@ -5,7 +5,7 @@
 #   file - the path of the file to check
 # Returns:
 #   None
-checkFileExistence() {
+file.exists() {
     file=$1
     if [ -f "$file" ]; then
         echo "File found: $file"
