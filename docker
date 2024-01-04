@@ -1,6 +1,3 @@
-# This function stops and removes Docker containers
-# If a container name is provided, it stops and removes that specific container
-# If no container name is provided, it stops and removes all containers
 docker_stop() {
 	if [ -z "$1" ]; then
 		# Stop and remove the specified container
@@ -8,9 +5,7 @@ docker_stop() {
 		docker rm "$1"
 	else
 		# Stop and remove all containers
-		for id in $(docker ps -a -q); do
-			docker stop "$id"
-			docker rm "$id"
-		done
+		docker stop $(docker ps -a -q)
+		docker rm $(docker ps -a -q)
 	fi
 }
