@@ -5,7 +5,7 @@ mountNFS() {
     #   $2: Port number
     #   $3: Export path on the NFS server
     #   $4: Mount directory on the local machine
-    #   -v or --verbose: Optional flag for verbose output
+    #   -v or --verbose: Optional flag for  everbose output
 
     if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
         echo "Usage: mountNFS <nfs_server_address> <port> <export_path> <mount_directory> [-v|--verbose]"
