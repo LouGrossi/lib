@@ -2,14 +2,62 @@
 
 # Function to check if a file exists
 # Arguments:
-#   file - the path of the file to check
+#   file_path - the path of the file to check
 # Returns:
 #   None
-file.exists() {
-    file=$1
-    if [ -f "$file" ]; then
-        echo "File found: $file"
+check_file_exists() {
+    file_path=$1
+    if [ -f "$file_path" ]; then
+        # File exists
+        return 0
     else
-        echo "File not found: $file"
+        # File does not exist
+        return 1
+    fi
+}
+
+# ff: Find files in a directory recursively and filter the results with a search term
+#
+# Usage: ff [OPTIONS] SEARCH_TERM
+#
+# Options:
+#   -d, --directory DIRECTORY  Specify the directory to search in (default: /)
+#   -e, --exact                Search for files with exact file name match
+#
+# Example usage:
+#   ff -d /path/to/directory -e my_search_term
+#
+# This function uses the 'find' command to search for files in a specified directory recursively.
+# The results are then filtered using the 'grep' command with the provided search term. If the
+# '--exact' or '-e' option is provided, only files with an exact match of the file name will be returned.
+
+ff() {
+    # Default directory to search
+    local directory="/"
+    # Default exact match flag
+    local exact_match=0
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+        -d | --directory)
+            shift
+            directory="$1"
+            ;;
+        -e | --exact)
+            exact_match=1
+            ;;
+        *)
+            break
+            ;;
+        esac
+        shift
+    done
+
+    # Use 'find' command to search for files in the specified directory recursively
+    # Pipe the results to 'grep' to filter based on the search term
+    if [ "$exact_match" -eq 1 ]; then
+        find "$directory" | grep -x "$1"
+    else
+        find "$directory" | grep "$1"
     fi
 }
