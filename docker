@@ -1,4 +1,4 @@
-docker_stop() {
+docker.destroy() {
 	if [ -z "$1" ]; then
 		# Stop and remove the specified container
 		docker stop "$1"
