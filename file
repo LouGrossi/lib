@@ -5,7 +5,7 @@
 #   file_path - the path of the file to check
 # Returns:
 #   None
-check_file_exists() {
+file.exists() {
     file_path=$1
     if [ -f "$file_path" ]; then
         # File exists
@@ -31,7 +31,7 @@ check_file_exists() {
 # The results are then filtered using the 'grep' command with the provided search term. If the
 # '--exact' or '-e' option is provided, only files with an exact match of the file name will be returned.
 
-ff() {
+file.find() {
     # Default directory to search
     local directory="/"
     # Default exact match flag
