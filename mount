@@ -1,4 +1,4 @@
-mountNFS() {
+mount.nfs() {
     # Function to mount an NFS drive
     # Parameters:
     #   $1: NFS server address
