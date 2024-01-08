@@ -1,0 +1,33 @@
+function notable-sync() {
+        local sync_type="$1"
+        local notable_dir="/Users/$(whoami)/.notable"
+
+        # Check if the notable directory exists
+        if ! [ -d "$notable_dir" ]; then
+                echo "Error: $notable_dir directory does not exist"
+                return 1
+        fi
+
+        if [ "$sync_type" = "--help" ] || [ "$sync_type" = "-h" ]; then
+                echo "Usage: notable-sync [sync_type]"
+                echo "Sync Types:"
+                echo "  push     - Push changes to GitHub"
+                echo "  pull     - Pull changes from GitHub"
+                return 0
+        fi
+
+        echo "-=%> Syncing Notable to GitHub <%=-"
+
+        if [ "$sync_type" = "push" ]; then
+                echo "-=%> Pushing: Syncing Notable to GitHub <%=-"
+        elif [ "$sync_type" = "pull" ]; then
+                echo "-=%> Pulling: Syncing Notable to GitHub <%=-"
+        else
+                echo "Error: Invalid value for 'sync_type'. Expected 'push' or 'pull'."
+                return 1
+        fi
+
+        git -C "$notable_dir" add .
+        git -C "$notable_dir" commit -m sync
+        git -C "$notable_dir" push -u origin main
+}
