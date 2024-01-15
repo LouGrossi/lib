@@ -1,0 +1,74 @@
+#!/bin/bash
+
+display_help() {
+  echo "Usage: script.sh [OPTIONS]"
+  echo "Create the standard directory structure for a TypeScript project."
+  echo
+  echo "Options:"
+  echo "  -d, --destination DIR    Set the project root directory (default: current directory)"
+  echo "  -h, --help               Display this help text"
+}
+
+create_typescript_project() {
+  # Set default project root directory to the current directory
+  project_root="."
+
+  # Process command-line arguments
+  while getopts "d:h" opt; do
+    case $opt in
+    d)
+      project_root=$OPTARG
+      ;;
+    h)
+      display_help
+      exit 0
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+    esac
+  done
+
+  # Display information about the actions to be performed
+  cat <<EOL
+This script will create the standard directory structure for a TypeScript project:
+- Project root directory: $project_root
+- Subdirectories: src/app/{components,services,models,utils}, tests, dist
+- Files: package.json, tslint.json, .gitignore, README.md, src/app/app.tsx
+- Run 'tsc --init' in the project root directory to generate tsconfig.json
+
+Do you want to proceed? (yes/no)
+EOL
+
+  # Read user input
+  read user_input
+
+  # Check user's response
+  if [ "$user_input" = "yes" ] || [ "$user_input" = "y" ]; then
+    # Create project structure
+    mkdir -p "$project_root/src/app/{components,services,models,utils}" \
+      "$project_root/tests" \
+      "$project_root/dist"
+
+    # Create files
+    touch "$project_root/package.json" \
+      "$project_root/tslint.json" \
+      "$project_root/.gitignore" \
+      "$project_root/README.md" \
+      "$project_root/src/app/app.tsx"
+
+    # Change to the project root directory
+    cd "$project_root" || exit
+
+    # Run tsc --init to generate tsconfig.json
+    tsc --init
+
+    # Print success message
+    echo "TypeScript project structure created successfully!"
+  else
+    # User chose not to proceed
+    echo "Script execution canceled. No changes were made."
+    exit 0
+  fi
+}
