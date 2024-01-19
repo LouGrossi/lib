@@ -1,0 +1,54 @@
+dns() {
+    if [[ $# -lt 2 ]]; then
+        echo "Usage: dns [options] <domain>"
+        echo
+        echo "Options:"
+        echo "  -a, --all  Query for all record types"
+        return 1
+    fi
+
+    local query_option=""
+    local domain_name=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        -a | --all)
+            query_option="--all"
+            ;;
+        *)
+            domain_name="$1"
+            ;;
+        esac
+        shift
+    done
+
+    if [ -z "$domain_name" ] || [ -z "$query_option" ]; then
+        echo "Usage: dns [options] <domain>"
+        echo
+        echo "Options:"
+        echo "  -a, --all  Query for all record types"
+        return 1
+    fi
+
+    # Array to store the record types
+    local record_types=("A" "AAAA" "MX" "NS")
+
+    echo "------------------------------------"
+    echo " DNS Query Results for $domain_name"
+    echo "------------------------------------"
+
+    # Perform the DNS query based on the query option
+    case "$query_option" in
+    "--all")
+        for type in "${record_types[@]}"; do
+            echo "Querying for $type records:"
+            dig "$domain_name" "$type" +short
+            echo
+        done
+        ;;
+    *)
+        echo "Invalid option. Use -a or --all to query for all record types."
+        return 1
+        ;;
+    esac
+}
