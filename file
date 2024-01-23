@@ -61,3 +61,14 @@ file.find() {
         find "$directory" | grep "$1"
     fi
 }
+
+file.source_files_in_directory() {
+    local directory="$1"
+    if [ -z "$directory" ]; then
+        echo "Usage: source_files_in_directory <directory>"
+        return 1
+    fi
+    for file in $(find "$directory" -type f ! -path '*/.git/*'); do
+        source "$file"
+    done
+}
