@@ -1,0 +1,4 @@
+# load helper libraries
+#for file in $(find ~/.config/lib/ -type f ! -path '*/.git/*'); do
+#    source "$file"
+#done
