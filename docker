@@ -1,11 +1,14 @@
-docker.destroy() {
+#!/bin/zsh
+
+docker.clean() {
 	if [ -z "$1" ]; then
-		# Stop and remove the specified container
 		docker stop "$1"
 		docker rm "$1"
 	else
-		# Stop and remove all containers
-		docker stop $(docker ps -a -q)
-		docker rm $(docker ps -a -q)
+		containers=($(docker ps -a -q))
+		for container_id in "${containers[@]}"; do
+			docker stop "$container_id"
+			docker rm "$container_id"
+		done
 	fi
 }
