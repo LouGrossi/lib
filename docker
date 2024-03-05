@@ -1,14 +1,17 @@
 #!/bin/zsh
 
-docker.clean() {
-	if [ -z "$1" ]; then
-		docker stop "$1"
-		docker rm "$1"
-	else
-		containers=($(docker ps -a -q))
-		for container_id in "${containers[@]}"; do
-			docker stop "$container_id"
-			docker rm "$container_id"
-		done
-	fi
+# Function to clean up Docker containers.
+clean_docker_containers() {
+    if [ -z "$1" ] || [ "$1" == "all" ]; then
+        local containers=($(docker ps -a -q))
+        for container_id in "${containers[@]}"; do
+            docker stop "$container_id"
+            docker rm "$container_id"
+        done
+    elif [ "$1" == "help" ]; then
+        echo "Usage: clean_docker_containers all | <container_id> | help"
+    else
+        docker stop "$1"
+        docker rm "$1"
+    fi
 }
