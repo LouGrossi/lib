@@ -1,0 +1,7 @@
+#!/bin/zsh
+function ollama.start() {
+    brew services start ollama
+}
+function ollama.stop() {
+    brew services stop ollama
+}
