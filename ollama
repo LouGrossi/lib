@@ -1,7 +1,31 @@
 #!/bin/zsh
-function ollama.start() {
-    brew services start ollama
+
+ollama.start() {
+    if [[ $1 == "ui" ]]; then
+        docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v ollama-webui:/app/backend/data --name ollama-webui --restart always ghcr.io/ollama-webui/ollama-webui:main
+        echo "Waiting for ollama-webui to start up..."
+        while ! curl -s localhost:3000 >/dev/null; do sleep 1; done
+        echo "ollama-webui is running on http://localhost:3000"
+        open "http://localhost:3000" &>/dev/null
+    else
+        brew services start ollama
+    fi
 }
-function ollama.stop() {
-    brew services stop ollama
+
+ollama.stop() {
+    if [[ $1 == "ui" ]]; then
+        docker stop ollama-webui && docker rm ollama-webui
+    else
+        brew services stop ollama
+    fi
 }
+
+ollama.models() {
+    if [[ $1 == "update" ]]; then
+        for model in $(ollama list | tail -n +2 | awk '{print $1}'); do
+            ollama pull $model
+        done
+    fi
+}
+
+    
