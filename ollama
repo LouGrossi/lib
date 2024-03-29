@@ -1,23 +1,56 @@
 #!/bin/zsh
 
+# Starts the ollama server and its UI.
+#
+# Usage: ollama start [ui]
+#
+# Positional arguments:
+#   ui      starts the web UI on port ${WEB_UI_PORT}
 ollama.start() {
+    # Port to run the web UI on
+    local WEB_UI_PORT=3000
+
+    if [[ $1 == "help" ]]; then
+        # Print help message
+        cat <<EOF
+${FUNCNAME[0]} starts the ollama server and its UI.
+
+usage: ${FUNCNAME[0]} [ui]
+
+positional arguments:
+  ui              starts the web UI on port ${WEB_UI_PORT}
+EOF
+        return
+    fi
+
     if [[ $1 == "ui" ]]; then
-        if ! ps aux | grep -v "grep" | grep -q "com.docker.virtualization"; then
+        # If Docker is not running, start it and wait for it to be ready
+        if ! pgrep -xq docker; then
             open -a Docker
-            echo "Starting Docker..."
-            until ps aux | grep -v "grep" | grep -q "com.docker.virtualization"; do
+            until pgrep -xq docker; do
                 sleep 1
             done
         fi
-        docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v ollama-webui:/app/backend/data --name ollama-webui --restart always ghcr.io/ollama-webui/ollama-webui:main
-        echo "Waiting for ollama-webui to start up..."
-        while ! curl -s localhost:3000 >/dev/null; do sleep 1; done
-        echo "ollama-webui is running on http://localhost:3000"
-        open "http://localhost:3000" &>/dev/null
+
+        # Run the web UI container and wait for it to be ready
+        docker run -d \
+            -p "${WEB_UI_PORT}:8080" \
+            --add-host=host.docker.internal:host-gateway \
+            -v ollama-webui:/app/backend/data \
+            --name ollama-webui \
+            --restart always \
+            ghcr.io/ollama-webui/ollama-webui:main
+        while ! curl -s -f "http://localhost:${WEB_UI_PORT}"; do sleep 1; done
+
+        # Open the web UI in a browser
+        open "http://localhost:${WEB_UI_PORT}"
     else
+        # Start the ollama server using Homebrew
         brew services start ollama
     fi
 }
+
+
 
 ollama.stop() {
     if [[ $1 == "ui" ]]; then
