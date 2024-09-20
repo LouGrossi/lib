@@ -1,71 +1,8 @@
-#!/bin/zsh
-
-# Starts the ollama server and its UI.
-#
-# Usage: ollama start [ui]
-#
-# Positional arguments:
-#   ui      starts the web UI on port ${WEB_UI_PORT}
-ollama.start() {
-    # Port to run the web UI on
-    local WEB_UI_PORT=3000
-
-    if [[ $1 == "help" ]]; then
-        # Print help message
-        cat <<EOF
-${FUNCNAME[0]} starts the ollama server and its UI.
-
-usage: ${FUNCNAME[0]} [ui]
-
-positional arguments:
-  ui              starts the web UI on port ${WEB_UI_PORT}
-EOF
-        return
-    fi
-
-    if [[ $1 == "ui" ]]; then
-        # If Docker is not running, start it and wait for it to be ready
-        if ! pgrep -xq docker; then
-            open -a Docker
-            until pgrep -xq docker; do
-                sleep 1
-            done
-        fi
-
-        # Run the web UI container and wait for it to be ready
-        docker run -d \
-            -p "${WEB_UI_PORT}:8080" \
-            --add-host=host.docker.internal:host-gateway \
-            -v ollama-webui:/app/backend/data \
-            --name ollama-webui \
-            --restart always \
-            ghcr.io/ollama-webui/ollama-webui:main
-        while ! curl -s -f "http://localhost:${WEB_UI_PORT}"; do sleep 1; done
-
-        # Open the web UI in a browser
-        open "http://localhost:${WEB_UI_PORT}"
-    else
-        # Start the ollama server using Homebrew
-        brew services start ollama
-    fi
+function update_all_models() {
+  for model in $(ollama list | awk 'NR>1 {print $1}'); do
+    ollama pull $model
+  done
 }
-
-
-
-ollama.stop() {
-    if [[ $1 == "ui" ]]; then
-        docker stop ollama-webui && docker rm ollama-webui
-    else
-        brew services stop ollama
-    fi
-}
-
-ollama.models() {
-    if [[ $1 == "update" ]]; then
-        for model in $(ollama list | tail -n +2 | awk '{print $1}'); do
-            ollama pull $model
-        done
-    fi
-}
-
-    
+alias ollama-update-all="{
+  update_all_models
+}"
